@@ -6,14 +6,19 @@
 #include <QFile>
 #include <QByteArray>
 #include <QStringList>
-
+#include <QHash>
+#include "config.h"
 
 #define OP(x)                  (buf[pc + x])
 #define MNEM(x)                (mnemonics[buf[pc + x]])
 #define SIZE_OF_OPCODE(x)      (opcode_bytes[buf[x]])
-#define ONE_BYTE               1
-#define TWO_BYTES              2
-#define THREE_BYTES            3
+
+
+struct mnemonics {   
+    quint8 size;    
+    QString txt;
+    QString desc;
+};
 
 class Task : public QObject
 {
@@ -29,7 +34,8 @@ public slots:
 
 private:
     QByteArray m_data;
-    QStringList
+    QHash<quint8, mnemonics> m_codes;
+    QStringList asm_text;
 };
 
 #endif // TASK_H
