@@ -33,6 +33,8 @@ public slots:
     void run();
 
 private:
+    quint16 pc;
+    bool isCanDecode( QByteArray::iterator current_iterator, quint8 size);
     QByteArray m_data;
     QHash<quint8, mnemonics> m_codes;
     QStringList asm_text;
