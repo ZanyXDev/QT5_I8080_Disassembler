@@ -227,29 +227,26 @@ Task::Task(QObject *parent) : QObject(parent)
     m_codes.insert(0x94,{1,"SUB H","Вычесть H из А"});
     m_codes.insert(0x95,{1,"SUB L","Вычесть L из А"});
     m_codes.insert(0x96,{1,"SUB M","Вычесть M из А"});
-    m_codes.insert(0xD6,{2,"SUI ","Вычесть [d8] из А"});
-
-    /*
-        m_codes.insert(0x9F,{1,"SBB A	9F	Вычесть А из А (очистить А)"});
-        m_codes.insert(0x98,{1,"SBB B	98	Вычесть c заёмом B из А"});
-        m_codes.insert(0x99,{1,"SBB C	99	Вычесть c заёмом C из А"});
-        m_codes.insert(0x9A,{1,"SBB D	9A	Вычесть c заёмом D из А"});
-        m_codes.insert(0x9B,{1,"SBB E	9B	Вычесть c заёмом E из А"});
-        m_codes.insert(0x9C,{1,"SBB H	9C	Вычесть c заёмом H из А"});
-        m_codes.insert(0x9D,{1,"SBB L	9D	Вычесть c заёмом L из А"});
-        m_codes.insert(0x9E,{1,"SBB M	9E	Вычесть c заёмом M из А"});
-        m_codes.insert(0xDE,{2,"SBI ","Вычесть c заемом [d8] из А"});
-        m_codes.insert(0xEB,{1,"XCHG	EB	Обмен содержимым DE и HL"});
-        m_codes.insert(0xE3,{1,"XTHL	E3	Обмен содержимого вершины стека с содержимым HL"});
-        m_codes.insert(0xAF,{1,"XRA A	AF	Исключающее ИЛИ A с A (очистка A)"});
-        m_codes.insert(0xA8,{1,"XRA B	A8	Исключающее ИЛИ B с A"});
-        m_codes.insert(0xA9,{1,"XRA C	A9	Исключающее ИЛИ C с A"});
-        m_codes.insert(0xAA,{1,"XRA D	AA	Исключающее ИЛИ D с A"});
-        m_codes.insert(0xAB,{1,"XRA E	AB	Исключающее ИЛИ E с A"});
-        m_codes.insert(0xAC,{1,"XRA H	AC	Исключающее ИЛИ H с A"});
-        m_codes.insert(0xAD,{1,"XRA L	AD	Исключающее ИЛИ L с A"});
-        m_codes.insert(0x,{1,"XRA M	AE	Исключающее ИЛИ Loc(HL) с A"});
-    */
+    m_codes.insert(0xD6,{2,"SUI ","Вычесть [d8] из А"});    
+    m_codes.insert(0x9F,{1,"SBB A","Вычесть А из А (очистить А)"});
+    m_codes.insert(0x98,{1,"SBB B","Вычесть c заёмом B из А"});
+    m_codes.insert(0x99,{1,"SBB C","Вычесть c заёмом C из А"});
+    m_codes.insert(0x9A,{1,"SBB D","Вычесть c заёмом D из А"});
+    m_codes.insert(0x9B,{1,"SBB E","Вычесть c заёмом E из А"});
+    m_codes.insert(0x9C,{1,"SBB H","Вычесть c заёмом H из А"});
+    m_codes.insert(0x9D,{1,"SBB L","Вычесть c заёмом L из А"});
+    m_codes.insert(0x9E,{1,"SBB M","Вычесть c заёмом M из А"});
+    m_codes.insert(0xDE,{2,"SBI ","Вычесть c заемом [d8] из А"});
+    m_codes.insert(0xEB,{1,"XCHG","Обмен содержимым DE и HL"});
+    m_codes.insert(0xE3,{1,"XTHL","Обмен содержимого вершины стека с содержимым HL"});
+    m_codes.insert(0xAF,{1,"XRA A","Исключающее ИЛИ A с A (очистка A)"});
+    m_codes.insert(0xA8,{1,"XRA B","Исключающее ИЛИ B с A"});
+    m_codes.insert(0xA9,{1,"XRA C","Исключающее ИЛИ C с A"});
+    m_codes.insert(0xAA,{1,"XRA D","Исключающее ИЛИ D с A"});
+    m_codes.insert(0xAB,{1,"XRA E","Исключающее ИЛИ E с A"});
+    m_codes.insert(0xAC,{1,"XRA H","Исключающее ИЛИ H с A"});
+    m_codes.insert(0xAD,{1,"XRA L","Исключающее ИЛИ L с A"});
+    m_codes.insert(0xAE,{1,"XRA M","Исключающее ИЛИ Loc(HL) с A"});
     m_codes.insert(0xEE,{2,"XRI","Исключающее ИЛИ d8 с A"});
 }
 
