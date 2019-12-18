@@ -7,6 +7,9 @@
 #include <QByteArray>
 #include <QStringList>
 #include <QHash>
+#include <QFileInfo>
+#include <QDir>
+#include <QTextStream>
 #include "config.h"
 
 #define OP(x)                  (buf[pc + x])
@@ -32,12 +35,14 @@ signals:
 public slots:
     void run();
 
-private:
-    quint16 pc;
+private:    
     bool isCanDecode( QByteArray::iterator current_iterator, quint8 size);
+    void saveDecodeText();
+    quint16 pc;
     QByteArray m_data;
     QHash<quint8, mnemonics> m_codes;
     QStringList asm_text;
+    QString outFileName;
 };
 
 #endif // TASK_H

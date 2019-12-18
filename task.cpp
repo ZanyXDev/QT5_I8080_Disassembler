@@ -227,7 +227,7 @@ Task::Task(QObject *parent) : QObject(parent)
     m_codes.insert(0x94,{1,"SUB H","Вычесть H из А"});
     m_codes.insert(0x95,{1,"SUB L","Вычесть L из А"});
     m_codes.insert(0x96,{1,"SUB M","Вычесть M из А"});
-    m_codes.insert(0xD6,{2,"SUI ","Вычесть [d8] из А"});    
+    m_codes.insert(0xD6,{2,"SUI ","Вычесть [d8] из А"});
     m_codes.insert(0x9F,{1,"SBB A","Вычесть А из А (очистить А)"});
     m_codes.insert(0x98,{1,"SBB B","Вычесть c заёмом B из А"});
     m_codes.insert(0x99,{1,"SBB C","Вычесть c заёмом C из А"});
@@ -258,6 +258,12 @@ void Task::loadFile(QString filename)
     {
         return;
     }
+
+    QFileInfo fi(filename);
+    outFileName = QString("%1/%2.asm")
+            .arg( fi.absolutePath() )
+            .arg( fi.baseName() );
+    qDebug() << fi.absolutePath() << " fn=" << fi.fileName();
     m_data = file.readAll();
     file.close();
 }
@@ -334,6 +340,10 @@ void Task::run()
     }else {
         qDebug() << "not found data in file!";
     }
+    if (! asm_text.isEmpty())
+    {
+        saveDecodeText();
+    }
     emit finished();
 }
 
@@ -352,18 +362,18 @@ bool Task::isCanDecode( QByteArray::iterator current_iterator, quint8 size )
     return false;
 
 }
-/*
- * QMap<QString, int> map;
-...
 
-        QHash<quint8, mnemonics>::const_iterator i;
-        for (i = m_codes.constBegin(); i != m_codes.constEnd(); ++i){
-            qDebug() << "key:"<< i.key();
+void Task::saveDecodeText()
+{
+    QFile fileOut(outFileName);
+
+    if(fileOut.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        QTextStream writeStream(&fileOut);
+        for ( QStringList::Iterator it = asm_text.begin(); it != asm_text.end(); ++it ){
+            writeStream << *it << "\n";
         }
+        fileOut.close();
+    }
 
-QMap<QString, int>::const_iterator i = map.find("HDR");
-while (i != map.end() && i.key() == "HDR") {
-    cout << i.value() << endl;
-    ++i;
 }
-*/
