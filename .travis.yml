@@ -12,5 +12,5 @@ script:
   - qmake -project
   - qmake i8080_dasm.pro
   - make
-  - ls -lhsa asmviewer
+  - ls -lhsa i8080_dasm
 
