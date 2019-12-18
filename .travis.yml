@@ -10,7 +10,7 @@ before_install:
 
 script: 
   - qmake -project
-  - qmake i8080_dasm.pro.pro
+  - qmake i8080_dasm.pro
   - make
   - ls -lhsa asmviewer
 
