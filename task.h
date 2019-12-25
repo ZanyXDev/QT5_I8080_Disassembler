@@ -10,6 +10,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QTextStream>
+#include <QDateTime>
 #include "config.h"
 
 #define OP(x)                  (buf[pc + x])
@@ -36,7 +37,6 @@ public slots:
     void run();
 
 private:    
-    bool isCanDecode( QByteArray::iterator current_iterator, quint8 size);
     void saveDecodeText();
     quint16 pc;
     QByteArray m_data;
