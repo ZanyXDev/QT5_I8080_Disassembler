@@ -97,6 +97,7 @@ Task::Task(QObject *parent) : QObject(parent)
     m_codes.insert(0x1A,{1,"LDAX D","Загрузить A из ячейки с адресом Loc(DE)"});
     m_codes.insert(0x2A,{3,"LHLD ","Загрузить в HL содержимое ячейки с адресом [a16]"});
     m_codes.insert(0x01,{3,"LXI B,","Загрузить в BC непосредственные данные [d16]"});
+    m_codes.insert(0x11,{3,"LXI D,","Загрузить в D непосредственные данные [d16]"});
     m_codes.insert(0x21,{3,"LXI H,","Загрузить в HL непосредственные данные [d16]"});
     m_codes.insert(0x31,{3,"LXI SP,","Загрузить в SP непосредственные данные [d16]"});
     m_codes.insert(0x7F,{1,"MOV A,A","Переслать из A в A"});
@@ -171,6 +172,15 @@ Task::Task(QObject *parent) : QObject(parent)
     m_codes.insert(0x2E,{2,"MVI L,","Переслать [d8] в L"});
     m_codes.insert(0x36,{2,"MVI M,","Переслать [d8] в Loc(HL)"});
     m_codes.insert(0x00,{1,"NOP","Нет операции"});
+
+    m_codes.insert(0x08,{1,"NOP","Undocumented NOP"});
+    m_codes.insert(0x10,{1,"NOP","Undocumented NOP"});
+    m_codes.insert(0x18,{1,"NOP","Undocumented NOP"});
+    m_codes.insert(0x20,{1,"NOP","Undocumented NOP"});
+    m_codes.insert(0x28,{1,"NOP","Undocumented NOP"});
+    m_codes.insert(0x30,{1,"NOP","Undocumented NOP"});
+    m_codes.insert(0x38,{1,"NOP","Undocumented NOP"});
+
     m_codes.insert(0xB7,{1,"ORA A","Проверить A и сбросить перенос"});
     m_codes.insert(0xB0,{1,"ORA B","Логичеcкая операция A ИЛИ B"});
     m_codes.insert(0xB1,{1,"ORA C","Логичеcкая операция A ИЛИ C"});
@@ -259,7 +269,14 @@ void Task::loadFile(QString filename)
         return;
     }
 
+    asm_text.append(QString("Filename %1 size %2 bytes, decoding usage i8080_dasm in %3\n")
+                    .arg( filename )
+                    .arg( file.size() )
+                    .arg( QDateTime::currentDateTime().toString() )
+                    );
+
     QFileInfo fi(filename);
+
     outFileName = QString("%1/%2.asm")
             .arg( fi.absolutePath() )
             .arg( fi.baseName() );
@@ -273,64 +290,99 @@ void Task::run()
     if ( !m_data.isEmpty() )
     {
 #ifdef LOCAL_DEBUG
-        pc= 0x00; // Start address monitor
+        pc= 0xF800; // Start address monitor
 #else
 #endif
+        /**
+         * @note Format output
+         * Address\t    Code\t   Label\t  Mnemonic\t   Operand\t   Comment
+         */
+        asm_text.append(QString("Output format\n") );
+        asm_text.append(QString("Address\tCode\tLabel\tMnemonic\tOperand\tComment\n") );
+
         QByteArray::iterator data_iterator = m_data.begin();
+
         while( data_iterator != m_data.end() )  // Disassembly loop
         {
             QString txt;
+            QString pc_adr;
+            QString code;
+            QString mnem;
+            QString desc;
+
             quint8 data_item = static_cast<quint8>( *data_iterator );
             QHash<quint8, mnemonics>::const_iterator mnemonic_iterator = m_codes.find(data_item);
             if ( mnemonic_iterator != m_codes.end() )
             {
+                QString d8_d16_txt;
+                quint8 d8_1;
+                quint8 d8_2;
+                quint16 addr16;
                 switch (mnemonic_iterator.value().size) {
                 case ONE_BYTE:
-                    txt =  QString("0x%1:\t%2\t%3")
-                            .arg(pc,0,16)
-                            .arg(mnemonic_iterator.value().txt)
-                            .arg(mnemonic_iterator.value().desc);
-                    qDebug() << txt;
+                    mnem = mnemonic_iterator.value().txt;
+                    desc = mnemonic_iterator.value().desc;
+                    code = QString("%1").arg(data_item,0,16);
+                    d8_d16_txt = QString(" ");
+                    pc_adr = QString("%1").arg(pc,0,16);
                     pc++;
                     break;
                 case TWO_BYTES:
-                    if ( isCanDecode(data_iterator,TWO_BYTES) )
+                    //i + n Итератор, указывающий на позицию n элементов вперед.
+                    if ( (data_iterator + 1) !=  m_data.end() )
                     {
+                        mnem = mnemonic_iterator.value().txt;
+                        desc = mnemonic_iterator.value().desc;
                         data_iterator++;
-                        txt =  QString("0x%1:\t%2 0x%3\t%4")
-                                .arg(pc,0,16)
-                                .arg(mnemonic_iterator.value().txt)
-                                .arg(static_cast<quint8>( *data_iterator ),0,16)
-                                .arg(mnemonic_iterator.value().desc);
-                        qDebug() << txt;
+                        d8_1 = static_cast<quint8>( *data_iterator );
+                        code = QString("%1 %2  ")
+                                .arg(data_item,0,16)
+                                .arg(d8_1,0,16);
+                        d8_d16_txt = QString("%1   ").arg(d8_1,0,16);
+                        pc_adr = QString("%1").arg(pc,0,16);
                         pc+=2;
+                    }else
+                    {
+                        d8_d16_txt = QString("Not found operand! data end or invalid opCode counter!");
                     }
                     break;
                 case THREE_BYTES:
-                    if ( isCanDecode(data_iterator,THREE_BYTES) )
+                    if ( (data_iterator + 2 ) !=  m_data.end() )
                     {
-                        quint8 d8_1 = static_cast<quint8>( *data_iterator );
+                        mnem = mnemonic_iterator.value().txt;
+                        desc = mnemonic_iterator.value().desc;
                         data_iterator++;
-                        quint8  d8_2 = static_cast<quint8>( *data_iterator );
+                        d8_1 = static_cast<quint8>( *data_iterator );
                         data_iterator++;
-                        quint16 addr16 = static_cast<quint16>( (d8_1 & 0x00FF) << 8 ) | ( d8_2 & 0x00FF) ;
-
-                        txt =  QString("0x%1:\t%2 0x%3\t%4")
-                                .arg(pc,0,16)
-                                .arg(mnemonic_iterator.value().txt)
-                                .arg(addr16,0,16)
-                                .arg(mnemonic_iterator.value().desc);
-                        qDebug() << txt;
+                        d8_2 = static_cast<quint8>( *data_iterator );
+                        addr16 = static_cast<quint16>( (d8_1 & 0x00FF) << 8 ) | ( d8_2 & 0x00FF) ;
+                        code = QString("%1 %2 %3")
+                                .arg(data_item,0,16)
+                                .arg(d8_1,0,16)
+                                .arg(d8_2,0,16);
+                        d8_d16_txt = QString("%1").arg(addr16,0,16);
+                        pc_adr = QString("%1").arg(pc,0,16);
                         pc+=3;
+                    }else
+                    {
+                        d8_d16_txt = QString("Not found operand! data end or invalid opCode counter!");
                     }
                     break;
                 default:
                     break;
                 }
+                txt =  QString("0x%1:\t%2\t%3\t%4\t0x%5\t;%6")
+                        .arg(pc_adr)       // Address
+                        .arg(code)     // opCode
+                        .arg(" ")           // Label
+                        .arg(mnem)          // Mnemonics
+                        .arg(d8_d16_txt)    // Operand or address
+                        .arg(desc);         // Description
             }else {
+                pc_adr = QString("%1").arg(pc,0,16);
                 pc++;
-                txt =  QString("0x%1:opCode[%2]\tNot found or illegal")
-                        .arg(pc,0,16)
+                txt =  QString("0x%1:opCode[0x%2]\tNot found or illegal")
+                        .arg(pc_adr)
                         .arg(data_item,0,16);
             }
             qDebug() << txt;
@@ -347,21 +399,7 @@ void Task::run()
     emit finished();
 }
 
-bool Task::isCanDecode( QByteArray::iterator current_iterator, quint8 size )
-{
-    QByteArray::iterator iterrator = current_iterator;
-    int i=0;
-    while (iterrator != m_data.end()){
-        i++;
-        iterrator++;
-        if (i >= size)
-        {
-            return  true;
-        }
-    }
-    return false;
 
-}
 
 void Task::saveDecodeText()
 {
